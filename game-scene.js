@@ -56,9 +56,7 @@ class GameScene extends Phaser.Scene {
 
         // 4. UI de Status
         const paletteY = this.offsetY + this.gridDisplaySize + this.innerPadding;
-        this.attemptsText = this.add.text(this.marginSide, paletteY + 85, `Tentativas: ${this.attempts}`, {
-            fontSize: '18px', color: '#aaaaaa', fontFamily: 'Inter', fontStyle: 'bold'
-        });
+        this.createAttemptsUI(paletteY + 85);
 
         // 6. Botão Voltar (Sair e Salvar)
         new MenuButton(this, width / 2, 750, 'VOLTAR E SALVAR', {
@@ -183,7 +181,7 @@ class GameScene extends Phaser.Scene {
 
             if (!isCorrect) {
                 this.attempts--;
-                this.attemptsText.setText(`Tentativas: ${this.attempts}`);
+                this.updateAttemptsUI(true);
                 this.cameras.main.shake(150, 0.005);
                 if (this.attempts <= 0) this.endGame("GAME OVER", "#ff0000");
             } else {
@@ -194,6 +192,44 @@ class GameScene extends Phaser.Scene {
         }
 
         this.updateVisualState();
+    }
+
+    createAttemptsUI(y) {
+        // Rótulo discreto
+        this.add.text(this.marginSide, y, 'ERROS', {
+            fontSize: '14px', color: '#888888', fontFamily: 'Montserrat', fontStyle: 'bold'
+        }).setOrigin(0, 0.5);
+
+        this.errorIcons = [];
+        const startX = this.marginSide + 70;
+        
+        for (let i = 0; i < 3; i++) {
+            const x = startX + (i * 30);
+            // Criamos um "X" vermelho, mas começamos com ele bem transparente (0.1)
+            const icon = this.add.text(x, y, 'X', {
+                fontSize: '24px', color: '#ff4747', fontFamily: 'Montserrat', fontStyle: '900'
+            }).setOrigin(0.5).setAlpha(0.1);
+            
+            this.errorIcons.push(icon);
+        }
+        this.updateAttemptsUI(); // Sincroniza o estado inicial (caso venha de um save)
+    }
+
+    updateAttemptsUI(animate = false) {
+        const errorsCommitted = 3 - this.attempts;
+        this.errorIcons.forEach((icon, index) => {
+            if (index < errorsCommitted) {
+                // Se este erro acabou de acontecer, aplicamos um efeito de escala
+                if (animate && index === errorsCommitted - 1 && icon.alpha < 1) {
+                    icon.setAlpha(1);
+                    GameEffects.scale(this, { onUpdate: (v) => icon.setScale(v), power: 0.8 });
+                } else {
+                    icon.setAlpha(1);
+                }
+            } else {
+                icon.setAlpha(0.1);
+            }
+        });
     }
 
     checkLineCompletion(row, col) {
