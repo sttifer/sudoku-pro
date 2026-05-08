@@ -37,6 +37,14 @@ class SudokuCell extends Phaser.GameObjects.Container {
         this.text.setColor(isCorrect ? '#ffff00' : '#ff0000');
     }
 
+    revealHint(correctValue) {
+        this.value = correctValue;
+        this.isReadOnly = true; // Trava a célula para não ser editada
+        this.text.setText(correctValue);
+        this.text.setColor('#ffffff'); // Cor de célula fixa
+        this.playSuccessAnimation();
+    }
+
     setHighlight(active) {
         this.bg.setAlpha(active ? 0.15 : 0);
     }

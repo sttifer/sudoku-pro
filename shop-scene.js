@@ -23,8 +23,8 @@ class ShopScene extends Phaser.Scene {
 
         // Exemplo de Item da Loja: Pacote de Dicas
         const hintPrice = 150;
-        new MenuButton(this, width / 2, 250, `COMPRAR 3 DICAS (🪙 ${hintPrice})`, {
-            width: 350,
+        new MenuButton(this, width / 2, 250, `💡 +3   🪙 ${hintPrice}`, {
+            width: 220,
             strokeColor: 0x4caf50,
             callback: () => {
                 const currentCoins = parseInt(localStorage.getItem('sudoku_coins') || '0');

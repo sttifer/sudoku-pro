@@ -73,6 +73,19 @@ class GameScene extends Phaser.Scene {
             }
         });
 
+        // Botão de Dica (Hint)
+        const hints = parseInt(localStorage.getItem('sudoku_hints') || '0');
+        this.hintButton = new MenuButton(this, width - 40, 40, `💡 ${hints}`, {
+            width: 60,
+            height: 40,
+            fontSize: '18px',
+            color: 0x1a1a1a,
+            strokeColor: 0x333333,
+            callback: () => this.useHint()
+        });
+
+        this.hintText = this.hintButton.label; // Referência para atualizar o texto
+
         // 5. AGORA SIM: Sincronizamos o visual pela primeira vez
         this.updateVisualState();
 
@@ -234,6 +247,46 @@ class GameScene extends Phaser.Scene {
                 icon.setAlpha(0.1);
             }
         });
+    }
+
+    useHint() {
+        if (this.gameOver) return;
+
+        let hints = parseInt(localStorage.getItem('sudoku_hints') || '0');
+        if (hints <= 0) {
+            this.cameras.main.shake(100, 0.005);
+            return;
+        }
+
+        // Encontrar todas as células que estão vazias ou erradas
+        const potentialCells = [];
+        for (let r = 0; r < 9; r++) {
+            for (let c = 0; c < 9; c++) {
+                if (this.sudoku.grid[r][c] !== this.sudoku.solution[r][c]) {
+                    potentialCells.push({ r, c });
+                }
+            }
+        }
+
+        if (potentialCells.length > 0) {
+            const choice = Phaser.Utils.Array.GetRandom(potentialCells);
+            const correctValue = this.sudoku.solution[choice.r][choice.c];
+
+            // Consumir dica
+            hints--;
+            localStorage.setItem('sudoku_hints', hints.toString());
+            this.hintText.setText(`💡 ${hints}`);
+
+            // Atualizar célula e lógica do jogo
+            this.cells[choice.r][choice.c].revealHint(correctValue);
+            this.sudoku.grid[choice.r][choice.c] = correctValue;
+            this.initialGrid[choice.r][choice.c] = correctValue; // Torna a dica "fixa" no save
+            
+            this.saveGame();
+            this.checkLineCompletion(choice.r, choice.c);
+            this.checkWin();
+            this.updateVisualState();
+        }
     }
 
     checkLineCompletion(row, col) {
