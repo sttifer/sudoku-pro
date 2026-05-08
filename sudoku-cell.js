@@ -7,7 +7,11 @@ class SudokuCell extends Phaser.GameObjects.Container {
         this.value = value;
         this.isReadOnly = isReadOnly; // Garanta que isso está sendo salvo
 
-        this.bg = scene.add.rectangle(0, 0, size - 2, size - 2, 0xffffff, 0).setOrigin(0.5);
+        // Camada de Destaque (Seleção) - Branca
+        this.bg = scene.add.rectangle(0, 0, size - 2, size - 2, 0xffffff, 1).setOrigin(0.5).setAlpha(0);
+        
+        // Camada de Sucesso (Completar linha/bloco) - Verde
+        this.successBg = scene.add.rectangle(0, 0, size - 2, size - 2, 0x00ff00, 1).setOrigin(0.5).setAlpha(0);
         
         // Estética: Números bloqueados (fixos) geralmente são brancos ou azul escuro
         // Números que o jogador coloca são de outra cor (ex: amarelo)
@@ -20,7 +24,7 @@ class SudokuCell extends Phaser.GameObjects.Container {
             fontFamily: 'Montserrat'
         }).setOrigin(0.5);
 
-        this.add([this.bg, this.text]);
+        this.add([this.bg, this.successBg, this.text]);
         scene.add.existing(this);
     }
 
@@ -34,7 +38,7 @@ class SudokuCell extends Phaser.GameObjects.Container {
     }
 
     setHighlight(active) {
-        this.bg.setFillStyle(0xffffff, active ? 0.15 : 0);
+        this.bg.setAlpha(active ? 0.15 : 0);
     }
 
     playSuccessAnimation(delay = 0) {
@@ -42,7 +46,7 @@ class SudokuCell extends Phaser.GameObjects.Container {
         GameEffects.flash(this.scene, {
             delay: delay,
             onUpdate: (val) => {
-                this.bg.setFillStyle(0x00ff00, val);
+                this.successBg.setAlpha(val);
             }
         });
 

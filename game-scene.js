@@ -58,11 +58,15 @@ class GameScene extends Phaser.Scene {
         const paletteY = this.offsetY + this.gridDisplaySize + this.innerPadding;
         this.createAttemptsUI(paletteY + 85);
 
-        // 6. Botão Voltar (Sair e Salvar)
-        new MenuButton(this, width / 2, 750, 'VOLTAR E SALVAR', {
-            width: 220,
-            scale: 0.7,
-            strokeColor: 0x999999,
+        // 6. Botão Voltar (Sair e Salvar) - Versão Minimalista
+        new MenuButton(this, 40, 40, '←', {
+            width: 40,
+            height: 40,
+            fontSize: '24px',
+            color: 0x1a1a1a,       // Mesma cor do fundo para camuflar
+            strokeColor: 0x333333,  // Borda muito sutil
+            textColor: '#777777',   // Texto cinza suave
+            textOffsetY: -3,        // Ajuste fino para centralizar a seta ←
             callback: () => {
                 this.saveGame();
                 this.scene.start('TitleScene');
@@ -183,7 +187,7 @@ class GameScene extends Phaser.Scene {
                 this.attempts--;
                 this.updateAttemptsUI(true);
                 this.cameras.main.shake(150, 0.005);
-                if (this.attempts <= 0) this.endGame("GAME OVER", "#ff0000");
+                if (this.attempts <= 0) this.endGame("GAME OVER", "#ff0000", false);
             } else {
                 this.checkLineCompletion(row, col);
                 this.checkWin();
@@ -324,10 +328,10 @@ class GameScene extends Phaser.Scene {
         const win = this.sudoku.grid.every((row, r) => 
             row.every((val, c) => val === this.sudoku.solution[r][c])
         );
-        if (win) this.endGame("VITÓRIA!", "#00ff00");
+        if (win) this.endGame("VITÓRIA!", "#00ff00", true);
     }
 
-    endGame(msg, color) {
+    endGame(msg, color, isWin) {
         this.gameOver = true;
         
         localStorage.removeItem('sudoku_save');
@@ -338,7 +342,9 @@ class GameScene extends Phaser.Scene {
         // Inicia a GameOverScene passando os dados do resultado
         this.scene.start('GameOverScene', { 
             message: msg, 
-            color: color 
+            color: color,
+            isWin: isWin,
+            difficulty: this.difficulty
         });
     }
 }

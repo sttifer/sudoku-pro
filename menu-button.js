@@ -11,6 +11,8 @@ class MenuButton extends Phaser.GameObjects.Container {
             fontSize: options.fontSize || '22px',
             textColor: options.textColor || '#ffffff',
             scale: options.scale || 1,
+            textOffsetX: options.textOffsetX || 0,
+            textOffsetY: options.textOffsetY || 0,
             callback: options.callback || (() => {})
         };
 
@@ -20,7 +22,7 @@ class MenuButton extends Phaser.GameObjects.Container {
         this.bg = scene.add.graphics();
         this.drawButton(this.config.color);
         
-        this.label = scene.add.text(0, 0, text, {
+        this.label = scene.add.text(this.config.textOffsetX, this.config.textOffsetY, text, {
             fontSize: this.config.fontSize,
             color: this.config.textColor,
             fontStyle: 'bold',

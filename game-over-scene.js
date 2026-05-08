@@ -7,6 +7,26 @@ class GameOverScene extends Phaser.Scene {
         // Recupera os dados enviados pela GameScene
         this.resultMessage = data.message || "FIM DE JOGO";
         this.resultColor = data.color || "#ffffff";
+        this.isWin = data.isWin || false;
+        this.reward = 0;
+
+        if (this.isWin) {
+            // Tabela de recompensas progressiva
+            const rewardTable = {
+                1: 20,   // Muito Fácil
+                3: 50,   // Fácil
+                5: 125,  // Médio
+                7: 300,  // Difícil
+                9: 750   // Especialista
+            };
+            this.reward = rewardTable[data.difficulty] || 100;
+            this.updateCoins(this.reward);
+        }
+    }
+
+    updateCoins(amount) {
+        const currentCoins = parseInt(localStorage.getItem('sudoku_coins') || '0');
+        localStorage.setItem('sudoku_coins', (currentCoins + amount).toString());
     }
 
     create() {
@@ -25,6 +45,16 @@ class GameOverScene extends Phaser.Scene {
             fill: this.resultColor,
             fontFamily: 'Montserrat'
         }).setOrigin(0.5);
+
+        // Exibição da Recompensa
+        if (this.isWin) {
+            this.add.text(width / 2, height * 0.3, `+${this.reward} MOEDAS`, {
+                fontSize: '28px',
+                color: '#ffeb3b',
+                fontFamily: 'Montserrat',
+                fontStyle: 'bold'
+            }).setOrigin(0.5);
+        }
 
         new MenuButton(this, width / 2, height / 2, 'JOGAR NOVAMENTE', {
             width: 250,      // Botão um pouco mais estreito
