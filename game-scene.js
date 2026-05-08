@@ -5,6 +5,7 @@ class GameScene extends Phaser.Scene {
 
     init(data) {
         // Recebe a dificuldade da TitleScene. Se não existir, assume 5.
+        this.saveData = data.saveData || null;
         this.difficulty = data.difficulty !== undefined ? data.difficulty : 5;
        
         this.cells = [];
@@ -22,8 +23,26 @@ class GameScene extends Phaser.Scene {
     }
 
     create() {
+        const { width, height } = this.scale;
+        
+        GameBackground.init(this);
+
         this.sudoku = new SudokuCore();
-        const board = this.sudoku.generate(this.difficulty);
+        let board;
+
+        if (this.saveData) {
+            // Carrega dados salvos
+            this.sudoku.grid = this.saveData.grid;
+            this.sudoku.solution = this.saveData.solution;
+            this.difficulty = this.saveData.difficulty;
+            this.attempts = this.saveData.attempts;
+            this.initialGrid = this.saveData.initialGrid;
+            board = this.sudoku.grid;
+        } else {
+            // Novo Jogo
+            board = this.sudoku.generate(this.difficulty);
+            this.initialGrid = board.map(row => [...row]);
+        }
 
         // 1. Primeiro criamos os containers (A ORDEM IMPORTA)
         this.gridContainer = this.add.container(this.marginSide, this.offsetY);
@@ -38,13 +57,35 @@ class GameScene extends Phaser.Scene {
         // 4. UI de Status
         const paletteY = this.offsetY + this.gridDisplaySize + this.innerPadding;
         this.attemptsText = this.add.text(this.marginSide, paletteY + 85, `Tentativas: ${this.attempts}`, {
-            fontSize: '20px', color: '#ffffff', fontFamily: 'Arial'
+            fontSize: '18px', color: '#aaaaaa', fontFamily: 'Inter', fontStyle: 'bold'
+        });
+
+        // 6. Botão Voltar (Sair e Salvar)
+        new MenuButton(this, width / 2, 750, 'VOLTAR E SALVAR', {
+            width: 220,
+            scale: 0.7,
+            strokeColor: 0x999999,
+            callback: () => {
+                this.saveGame();
+                this.scene.start('TitleScene');
+            }
         });
 
         // 5. AGORA SIM: Sincronizamos o visual pela primeira vez
         this.updateVisualState();
 
         this.input.on('pointerdown', (pointer) => this.handleInput(pointer));
+    }
+
+    saveGame() {
+        const data = {
+            grid: this.sudoku.grid,
+            solution: this.sudoku.solution,
+            initialGrid: this.initialGrid,
+            attempts: this.attempts,
+            difficulty: this.difficulty
+        };
+        localStorage.setItem('sudoku_save', JSON.stringify(data));
     }
 
     setupGrid(board) {
@@ -63,11 +104,18 @@ class GameScene extends Phaser.Scene {
             this.cells[r] = [];
             for (let c = 0; c < 9; c++) {
                 const val = board[r][c];
-                const isLocked = (val !== 0);
+                // Células bloqueadas são apenas as que estavam no tabuleiro inicial
+                const isLocked = (this.initialGrid[r][c] !== 0);
                 const x = (c * this.cellSize) + (this.cellSize / 2);
                 const y = (r * this.cellSize) + (this.cellSize / 2);
                 
                 const cell = new SudokuCell(this, x, y, r, c, val, isLocked, this.cellSize);
+                
+                // Ajuste de cor para valores carregados que estavam errados
+                if (!isLocked && val !== 0 && val !== this.sudoku.solution[r][c]) {
+                    cell.text.setColor('#ff0000');
+                }
+
                 this.gridContainer.add(cell);
                 this.cells[r][c] = cell;
             }
@@ -125,6 +173,7 @@ class GameScene extends Phaser.Scene {
         if (this.selectedNumber === 0 || cell.value === this.selectedNumber) {
             cell.updateValue(0, true);
             this.sudoku.grid[row][col] = 0;
+            this.saveGame();
         } 
         // Lógica para preencher:
         else {
@@ -138,11 +187,52 @@ class GameScene extends Phaser.Scene {
                 this.cameras.main.shake(150, 0.005);
                 if (this.attempts <= 0) this.endGame("GAME OVER", "#ff0000");
             } else {
+                this.checkLineCompletion(row, col);
                 this.checkWin();
             }
+            this.saveGame();
         }
 
         this.updateVisualState();
+    }
+
+    checkLineCompletion(row, col) {
+        // Verificar Linha
+        const isRowComplete = this.cells[row].every((cell, c) => 
+            this.sudoku.grid[row][c] === this.sudoku.solution[row][c]);
+        
+        if (isRowComplete) {
+            this.cells[row].forEach((cell, i) => cell.playSuccessAnimation(i * 50));
+        }
+
+        // Verificar Coluna
+        let isColComplete = true;
+        for (let r = 0; r < 9; r++) {
+            if (this.sudoku.grid[r][col] !== this.sudoku.solution[r][col]) {
+                isColComplete = false;
+                break;
+            }
+        }
+        if (isColComplete) {
+            for (let r = 0; r < 9; r++) {
+                this.cells[r][col].playSuccessAnimation(r * 50);
+            }
+        }
+
+        // Verificar Bloco 3x3
+        const startRow = Math.floor(row / 3) * 3;
+        const startCol = Math.floor(col / 3) * 3;
+        let isBoxComplete = true;
+        let boxCells = [];
+        for (let r = startRow; r < startRow + 3; r++) {
+            for (let c = startCol; c < startCol + 3; c++) {
+                boxCells.push(this.cells[r][c]);
+                if (this.sudoku.grid[r][c] !== this.sudoku.solution[r][c]) isBoxComplete = false;
+            }
+        }
+        if (isBoxComplete) {
+            boxCells.forEach((cell, i) => cell.playSuccessAnimation(i * 50));
+        }
     }
 
     updateVisualState() {
@@ -204,6 +294,8 @@ class GameScene extends Phaser.Scene {
     endGame(msg, color) {
         this.gameOver = true;
         
+        localStorage.removeItem('sudoku_save');
+
         // Para a música de fundo se houver e limpa eventos
         this.input.removeAllListeners();
 

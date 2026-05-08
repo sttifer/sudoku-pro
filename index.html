@@ -5,6 +5,10 @@
     <!-- Força o navegador a respeitar o tamanho real da tela -->
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Sudoku Mobile Ready</title>
+    <!-- Google Fonts: Montserrat (Bold) e Inter (Regular/Bold) -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700&family=Montserrat:wght@700;900&display=swap" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/phaser@3.60.0/dist/phaser-arcade-physics.min.js"></script>
     <style>
         body {
@@ -31,11 +35,14 @@
         }
     </style>
 <!-- Scripts do Projeto -->
+    <script src="game-effects.js"></script>
+    <script src="game-background.js"></script>
     <script src="sudoku-core.js"></script>
     <script src="sudoku-cell.js"></script>
     <script src="menu-button.js"></script>
     <script src="title-scene.js"></script>
     <script src="stage-select-scene.js"></script>
+    <script src="continue-scene.js"></script>
     <script src="game-scene.js"></script>
     <script src="game-over-scene.js"></script>
     <script src="main.js"></script>

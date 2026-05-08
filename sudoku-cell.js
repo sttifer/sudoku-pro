@@ -16,7 +16,8 @@ class SudokuCell extends Phaser.GameObjects.Container {
         this.text = scene.add.text(0, 0, value !== 0 ? value : '', {
             fontSize: `${Math.floor(size * 0.6)}px`,
             color: textColor,
-            fontStyle: 'bold'
+            fontStyle: 'bold',
+            fontFamily: 'Montserrat'
         }).setOrigin(0.5);
 
         this.add([this.bg, this.text]);
@@ -34,5 +35,24 @@ class SudokuCell extends Phaser.GameObjects.Container {
 
     setHighlight(active) {
         this.bg.setFillStyle(0xffffff, active ? 0.15 : 0);
+    }
+
+    playSuccessAnimation(delay = 0) {
+        // Delega a animação de brilho
+        GameEffects.flash(this.scene, {
+            delay: delay,
+            onUpdate: (val) => {
+                this.bg.setFillStyle(0x00ff00, val);
+            }
+        });
+
+        // Delega a animação de relevo (escala)
+        GameEffects.scale(this.scene, {
+            delay: delay,
+            power: 0.2,
+            onUpdate: (val) => {
+                this.setScale(val);
+            }
+        });
     }
 }

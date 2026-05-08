@@ -6,15 +6,15 @@ class StageSelectScene extends Phaser.Scene {
     create() {
         const { width, height } = this.cameras.main;
 
-        // Fundo
-        this.add.rectangle(0, 0, width, height, 0x1a1a1a).setOrigin(0);
+        // Aplica o fundo isolado
+        GameBackground.init(this);
 
         // Título
         this.add.text(width / 2, 80, 'DIFICULDADE', {
             fontSize: '40px',
             color: '#ffffff',
             fontStyle: 'bold',
-            fontFamily: 'Arial'
+            fontFamily: 'Montserrat'
         }).setOrigin(0.5);
 
         // Mapeamento das dificuldades (1, 3, 5, 7, 9)

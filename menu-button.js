@@ -2,7 +2,7 @@ class MenuButton extends Phaser.GameObjects.Container {
     constructor(scene, x, y, text, options = {}) {
         super(scene, x, y);
 
-        const config = {
+        this.config = {
             width: options.width || 300,
             height: options.height || 60,
             color: options.color || 0x333333,
@@ -14,48 +14,56 @@ class MenuButton extends Phaser.GameObjects.Container {
             callback: options.callback || (() => {})
         };
 
-        this.setScale(config.scale);
+        this.setScale(this.config.scale);
 
-        this.bg = scene.add.rectangle(0, 0, config.width, config.height, config.color)
-            .setStrokeStyle(config.strokeWidth, config.strokeColor);
+        // Usamos Graphics para permitir bordas arredondadas
+        this.bg = scene.add.graphics();
+        this.drawButton(this.config.color);
         
         this.label = scene.add.text(0, 0, text, {
-            fontSize: config.fontSize,
-            color: config.textColor,
+            fontSize: this.config.fontSize,
+            color: this.config.textColor,
             fontStyle: 'bold',
-            fontFamily: 'Arial'
+            fontFamily: 'Inter'
         }).setOrigin(0.5);
 
         this.add([this.bg, this.label]);
 
-        this.bg.setInteractive({ useHandCursor: true });
+        // Define a área interativa manualmente para o Graphics
+        const hitArea = new Phaser.Geom.Rectangle(-this.config.width/2, -this.config.height/2, this.config.width, this.config.height);
+        this.bg.setInteractive(hitArea, Phaser.Geom.Rectangle.Contains).setCursorHandler;
 
-        // --- CORREÇÃO AQUI ---
-        // Criamos um objeto de cor do Phaser para manipular o brilho
-        const baseColor = Phaser.Display.Color.ValueToColor(config.color);
-        const hoverColor = Phaser.Display.Color.ValueToColor(config.color).lighten(20).color;
+        const hoverColor = Phaser.Display.Color.ValueToColor(this.config.color).lighten(10).color;
 
         this.bg.on('pointerover', () => {
-            this.bg.setFillStyle(hoverColor);
-            this.setScale(config.scale * 1.05);
+            this.drawButton(hoverColor);
+            this.setScale(this.config.scale * 1.02);
         });
 
         this.bg.on('pointerout', () => {
-            this.bg.setFillStyle(config.color);
-            this.setScale(config.scale);
+            this.drawButton(this.config.color);
+            this.setScale(this.config.scale);
         });
-        // ---------------------
 
         this.bg.on('pointerdown', () => {
             scene.tweens.add({
                 targets: this,
-                scale: config.scale * 0.95,
-                duration: 50,
+                scale: this.config.scale * 0.98,
+                duration: 80,
                 yoyo: true,
-                onComplete: config.callback
+                onComplete: this.config.callback
             });
         });
 
         scene.add.existing(this);
+    }
+
+    drawButton(color) {
+        this.bg.clear();
+        this.bg.fillStyle(color, 1);
+        this.bg.lineStyle(this.config.strokeWidth, this.config.strokeColor);
+        // 20 é o raio do arredondamento das pontas
+        this.bg.fillRoundedRect(-this.config.width/2, -this.config.height/2, this.config.width, this.config.height, 20);
+        this.bg.strokeRoundedRect(-this.config.width/2, -this.config.height/2, this.config.width, this.config.height, 20);
     }
 }
