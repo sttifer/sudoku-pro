@@ -10,8 +10,9 @@ class TitleScene extends Phaser.Scene {
         GameBackground.init(this);
 
         // Título do Jogo
+        const titleSize = Math.floor(width * 0.12);
         this.add.text(width / 2, height * 0.2, 'SUDOKU PRO', {
-            fontSize: '52px',
+            fontSize: `${titleSize}px`,
             fontStyle: '900',
             fill: '#ffffff',
             fontFamily: 'Montserrat',
@@ -20,18 +21,20 @@ class TitleScene extends Phaser.Scene {
 
         // Display de Moedas no topo
         const coins = localStorage.getItem('sudoku_coins') || '0';
-        this.add.text(width - 25, 40, `🪙 ${coins}`, {
-            fontSize: '20px',
+        const uiFontSize = Math.floor(width * 0.05);
+        this.add.text(width - (width * 0.05), height * 0.05, `🪙 ${coins}`, {
+            fontSize: `${uiFontSize}px`,
             fontFamily: 'Montserrat',
             fontStyle: 'bold',
             color: '#ffeb3b'
         }).setOrigin(1, 0.5);
 
         // Botão da Loja (Ícone)
-        new MenuButton(this, 40, 40, '🛒', {
-            width: 45,
-            height: 45,
-            fontSize: '24px',
+        const btnSize = width * 0.12;
+        new MenuButton(this, btnSize, height * 0.05, '🛒', {
+            width: btnSize,
+            height: btnSize,
+            fontSize: `${Math.floor(btnSize * 0.5)}px`,
             color: 0x1a1a1a,
             strokeColor: 0x444444,
             textOffsetY: -2,
@@ -41,8 +44,8 @@ class TitleScene extends Phaser.Scene {
         });
 
         new MenuButton(this, width / 2, height / 2, 'JOGAR', {
-            width: 250,      // Botão um pouco mais estreito
-            scale: 1,      // Escala menor para hierarquia visual
+            width: width * 0.6,
+            fontSize: `${Math.floor(width * 0.07)}px`,
             strokeColor: 0x999999,
             callback: () => {
                 const save = localStorage.getItem('sudoku_save');

@@ -4,6 +4,7 @@ class GameScene extends Phaser.Scene {
     }
 
     init(data) {
+        const { width, height } = this.scale;
         // Recebe a dificuldade da TitleScene. Se não existir, assume 5.
         this.saveData = data.saveData || null;
         this.difficulty = data.difficulty !== undefined ? data.difficulty : 5;
@@ -15,11 +16,17 @@ class GameScene extends Phaser.Scene {
         this.paletteItems = [];
         
         // Layout
-        this.marginSide = 20;
-        this.innerPadding = 30;
-        this.gridDisplaySize = 450 - (this.marginSide * 2);
+        this.marginSide = width * 0.05; // 5% da largura de margem
+        this.innerPadding = height * 0.04; // 4% da altura de respiro
+
+        // Calcula o tamanho do grid de forma responsiva: 
+        // Removemos o limite fixo de 500 para permitir resoluções altas (HD/4K)
+        this.gridDisplaySize = Math.min(width - (this.marginSide * 2), height * 0.55);
         this.cellSize = this.gridDisplaySize / 9;
-        this.offsetY = (800 - (this.gridDisplaySize + 60 + 150)) / 2;
+        
+        this.offsetX = (width - this.gridDisplaySize) / 2;
+        // Posicionamento vertical dinâmico (aproximadamente 15% do topo)
+        this.offsetY = height * 0.15;
     }
 
     create() {
@@ -45,8 +52,11 @@ class GameScene extends Phaser.Scene {
         }
 
         // 1. Primeiro criamos os containers (A ORDEM IMPORTA)
-        this.gridContainer = this.add.container(this.marginSide, this.offsetY);
-        this.paletteContainer = this.add.container(this.marginSide, this.offsetY + this.gridDisplaySize + this.innerPadding);
+        this.gridContainer = this.add.container(this.offsetX, this.offsetY);
+        
+        // A paleta agora se posiciona logo abaixo do grid com base no padding dinâmico
+        const paletteY = this.offsetY + this.gridDisplaySize + this.innerPadding;
+        this.paletteContainer = this.add.container(this.offsetX, paletteY);
 
         // 2. Populamos o Grid
         this.setupGrid(board); // <--- Remova o this.updateVisualState() de dentro desse método!
@@ -55,30 +65,22 @@ class GameScene extends Phaser.Scene {
         this.setupPalette();
 
         // 4. UI de Status
-        const paletteY = this.offsetY + this.gridDisplaySize + this.innerPadding;
-        this.createAttemptsUI(paletteY + 85);
+        this.createAttemptsUI(paletteY + (this.cellSize * 2.1));
 
         // 6. Botão Voltar (Sair e Salvar) - Versão Minimalista
-        new MenuButton(this, 40, 40, '←', {
-            width: 40,
-            height: 40,
-            fontSize: '24px',
-            color: 0x1a1a1a,       // Mesma cor do fundo para camuflar
-            strokeColor: 0x333333,  // Borda muito sutil
-            textColor: '#777777',   // Texto cinza suave
-            textOffsetY: -3,        // Ajuste fino para centralizar a seta ←
-            callback: () => {
-                this.saveGame();
-                this.scene.start('TitleScene');
-            }
-        });
+        const backBtnSize = Math.max(40, width * 0.1);
+        // Usa o BackButton padronizado para o botão de gameplay
+        new BackButton(this, backBtnSize, backBtnSize, '←', 'TitleScene');
 
         // Botão de Dica (Hint)
         const hints = parseInt(localStorage.getItem('sudoku_hints') || '0');
-        this.hintButton = new MenuButton(this, width - 40, 40, `💡 ${hints}`, {
-            width: 60,
-            height: 40,
-            fontSize: '18px',
+        // Aumentamos a largura para comportar números maiores (ex: 999) sem encostar na borda
+        const hintBtnWidth = backBtnSize * 2.2;
+        // Posicionamos para que a margem direita seja exatamente igual à margem esquerda do botão voltar
+        this.hintButton = new MenuButton(this, width - (hintBtnWidth/2) - (backBtnSize/2), backBtnSize, `💡 ${hints}`, {
+            width: hintBtnWidth,
+            height: backBtnSize,
+            fontSize: `${Math.floor(backBtnSize * 0.4)}px`,
             color: 0x1a1a1a,
             strokeColor: 0x333333,
             callback: () => this.useHint()
@@ -139,11 +141,13 @@ class GameScene extends Phaser.Scene {
 
     setupPalette() {
         const itemW = this.gridDisplaySize / 10;
+        const itemH = this.cellSize * 1.2; // Altura da paleta proporcional à célula
+
         for (let i = 0; i <= 9; i++) {
             const x = (i * itemW) + (itemW / 2);
-            const bg = this.add.rectangle(x, 25, itemW - 4, 50, 0x333333).setOrigin(0.5);
-            const text = this.add.text(x, 25, i === 0 ? "X" : i, {
-                fontSize: '24px', color: '#fff', fontStyle: 'bold'
+            const bg = this.add.rectangle(x, itemH/2, itemW - 4, itemH, 0x333333).setOrigin(0.5);
+            const text = this.add.text(x, itemH/2, i === 0 ? "X" : i, {
+                fontSize: `${Math.floor(itemH * 0.5)}px`, color: '#fff', fontStyle: 'bold'
             }).setOrigin(0.5);
             
             this.paletteContainer.add([bg, text]);
@@ -167,7 +171,8 @@ class GameScene extends Phaser.Scene {
         const palX = pointer.x - this.paletteContainer.x;
         const palY = pointer.y - this.paletteContainer.y;
 
-        if (palY >= 0 && palY <= 50) {
+        const itemH = this.cellSize * 1.2;
+        if (palY >= 0 && palY <= itemH) {
             const col = Math.floor(palX / (this.gridDisplaySize / 10));
             if (col >= 0 && col <= 9) {
                 this.selectedNumber = col;
@@ -212,19 +217,22 @@ class GameScene extends Phaser.Scene {
     }
 
     createAttemptsUI(y) {
+        const fontSize = Math.floor(this.gridDisplaySize * 0.04);
         // Rótulo discreto
-        this.add.text(this.marginSide, y, 'ERROS', {
-            fontSize: '14px', color: '#888888', fontFamily: 'Montserrat', fontStyle: 'bold'
+        this.add.text(this.offsetX, y, 'ERROS', {
+            fontSize: `${fontSize}px`, color: '#888888', fontFamily: 'Montserrat', fontStyle: 'bold'
         }).setOrigin(0, 0.5);
 
         this.errorIcons = [];
-        const startX = this.marginSide + 70;
+        // Alinhamento dinâmico: os ícones começam após o texto "ERROS" 
+        // baseado em uma proporção do tamanho total do grid
+        const startX = this.offsetX + (this.gridDisplaySize * 0.25);
         
         for (let i = 0; i < 3; i++) {
-            const x = startX + (i * 30);
+            const x = startX + (i * fontSize * 2.2);
             // Criamos um "X" vermelho, mas começamos com ele bem transparente (0.1)
             const icon = this.add.text(x, y, 'X', {
-                fontSize: '24px', color: '#ff4747', fontFamily: 'Montserrat', fontStyle: '900'
+                fontSize: `${fontSize * 1.8}px`, color: '#ff4747', fontFamily: 'Montserrat', fontStyle: '900'
             }).setOrigin(0.5).setAlpha(0.1);
             
             this.errorIcons.push(icon);

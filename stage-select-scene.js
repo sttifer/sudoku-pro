@@ -48,14 +48,8 @@ class StageSelectScene extends Phaser.Scene {
             startY += spacing;
         });
 
-        // Botão de Voltar usando a nova classe MenuButton
-        new MenuButton(this, width / 2, height - 100, 'VOLTAR', {
-            width: 250,      // Botão um pouco mais estreito
-            scale: 0.8,      // Escala menor para hierarquia visual
-            strokeColor: 0x999999,
-            callback: () => {
-                this.scene.start('TitleScene');
-            }
-        });
+        // Padronização: Botão de voltar com o ícone de setinha no canto superior
+        const btnSize = Math.max(40, width * 0.1);
+        new BackButton(this, btnSize, btnSize, '←', 'TitleScene');
     }
 }

@@ -8,11 +8,13 @@ class ContinueScene extends Phaser.Scene {
 
         GameBackground.init(this);
 
-        this.add.text(width / 2, height * 0.2, 'PARTIDA ENCONTRADA', {
-            fontSize: '32px',
+        const fontSize = Math.floor(width * 0.08);
+        this.add.text(width / 2, height * 0.25, 'PARTIDA\nENCONTRADA', {
+            fontSize: `${fontSize}px`,
             fontStyle: 'bold',
             fill: '#ffffff',
-            fontFamily: 'Montserrat'
+            fontFamily: 'Montserrat',
+            align: 'center'
         }).setOrigin(0.5);
 
         // Botão para Continuar
@@ -34,13 +36,8 @@ class ContinueScene extends Phaser.Scene {
         });
 
         // Botão Voltar
-        new MenuButton(this, width / 2, height - 100, 'VOLTAR', {
-            width: 200,
-            scale: 0.8,
-            strokeColor: 0x999999,
-            callback: () => {
-                this.scene.start('TitleScene');
-            }
-        });
+        // Padronização: Botão de voltar com o ícone de setinha no canto superior
+        const btnSize = Math.max(40, width * 0.1);
+        new BackButton(this, btnSize, btnSize, '←', 'TitleScene');
     }
 }

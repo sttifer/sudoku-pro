@@ -1,13 +1,14 @@
 const config = {
     type: Phaser.AUTO,
     parent: 'phaser-game',
-    width: 450,
-    height: 800,
+    width: window.innerWidth,
+    height: window.innerHeight,
     backgroundColor: '#1a1a1a',
     resolution: window.devicePixelRatio || 1,
     render: { antialias: true, roundPixels: true },
+    autoRound: true,
     scale: {
-        mode: Phaser.Scale.FIT,
+        mode: Phaser.Scale.RESIZE,
         autoCenter: Phaser.Scale.CENTER_BOTH
     },
     scene: [TitleScene, StageSelectScene, ContinueScene, GameScene, GameOverScene, ShopScene]
