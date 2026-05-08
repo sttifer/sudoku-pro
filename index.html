@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <!-- Força o navegador a respeitar o tamanho real da tela -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Sudoku Mobile Ready</title>
+    <script src="https://cdn.jsdelivr.net/npm/phaser@3.60.0/dist/phaser-arcade-physics.min.js"></script>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            overflow: hidden;
+            background-color: #1a1a1a;
+        }
+        #phaser-game canvas {
+            /* Isso impede o navegador de tentar scrollar a página ao tocar no jogo */
+            touch-action: none;
+            user-select: none;
+            -webkit-tap-highlight-color: rgba(0,0,0,0);
+        }
+        canvas {
+            /* Impede ações padrão do browser como scroll e pinch-zoom */
+            touch-action: none; 
+            
+            /* Remove o realce azul ao tocar (comum no Android) */
+            -webkit-tap-highlight-color: rgba(0,0,0,0);
+            
+            /* Impede seleção de texto acidental ao clicar rápido */
+            user-select: none; 
+        }
+    </style>
+<!-- Scripts do Projeto -->
+    <script src="sudoku-core.js"></script>
+    <script src="sudoku-cell.js"></script>
+    <script src="menu-button.js"></script>
+    <script src="title-scene.js"></script>
+    <script src="stage-select-scene.js"></script>
+    <script src="game-scene.js"></script>
+    <script src="game-over-scene.js"></script>
+    <script src="main.js"></script>
+</head>
+<body>
+    <div id="phaser-game"></div>
+</body>
+</html>
