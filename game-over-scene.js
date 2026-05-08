@@ -15,9 +15,9 @@ class GameOverScene extends Phaser.Scene {
             const rewardTable = {
                 1: 20,   // Muito Fácil
                 3: 50,   // Fácil
-                5: 125,  // Médio
-                7: 300,  // Difícil
-                9: 750   // Especialista
+                5: 100,  // Médio
+                7: 200,  // Difícil
+                9: 500   // Especialista
             };
             this.reward = rewardTable[data.difficulty] || 100;
             this.updateCoins(this.reward);

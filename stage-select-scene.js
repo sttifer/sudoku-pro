@@ -31,10 +31,18 @@ class StageSelectScene extends Phaser.Scene {
 
         // Cria os botões de dificuldade usando a nova classe MenuButton
         difficulties.forEach((diff) => {
-            new MenuButton(this, width / 2, startY, diff.label, {
-                strokeColor: diff.color,
+            // A primeira dificuldade (1) é sempre aberta. As outras dependem da loja.
+            const isUnlocked = diff.value === 1 || localStorage.getItem(`sudoku_unlocked_${diff.value}`) === 'true';
+            
+            new MenuButton(this, width / 2, startY, isUnlocked ? diff.label : `🔒 ${diff.label}`, {
+                strokeColor: isUnlocked ? diff.color : 0x444444,
+                textColor: isUnlocked ? '#ffffff' : '#777777',
                 callback: () => {
-                    this.scene.start('GameScene', { difficulty: diff.value });
+                    if (isUnlocked) {
+                        this.scene.start('GameScene', { difficulty: diff.value });
+                    } else {
+                        this.cameras.main.shake(100, 0.005);
+                    }
                 }
             });
             startY += spacing;
