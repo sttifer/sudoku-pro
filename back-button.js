@@ -11,16 +11,15 @@ class BackButton extends MenuButton {
      */
     constructor(scene, x, y, text, targetScene, options = {}) {
         const { width } = scene.scale;
-        const baseBtnSize = Math.max(40, width * 0.1); // Tamanho base para cálculos proporcionais
+        const baseBtnSize = width * 0.13; // Tamanho padronizado (aprox 70px)
 
         const defaultStyleOptions = {
             width: baseBtnSize, // Largura padrão (pode ser sobrescrita)
             height: baseBtnSize, // Altura padrão (pode ser sobrescrita)
-            fontSize: `${Math.floor(baseBtnSize * 0.6)}px`, // Tamanho da fonte proporcional
+            fontSize: `${Math.floor(baseBtnSize * 0.55)}px`, // Aumentado para 55% para melhor preenchimento
             color: 0x1a1a1a,
             strokeColor: 0x333333,
             textColor: '#777777',
-            textOffsetY: -3,
             callback: () => {
                 if (scene.scene.key === 'GameScene' && typeof scene.saveGame === 'function') {
                     scene.saveGame();

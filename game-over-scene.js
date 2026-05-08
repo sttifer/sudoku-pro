@@ -39,8 +39,9 @@ class GameOverScene extends Phaser.Scene {
         localStorage.removeItem('sudoku_save');
 
         // Texto de Resultado (Vitória/Derrota)
-        this.add.text(width / 2, height * 0.2, this.resultMessage, {
-            fontSize: '54px',
+        const titleSize = Math.floor(width * 0.12);
+        this.add.text(width / 2, height * 0.25, this.resultMessage, {
+            fontSize: `${titleSize}px`,
             fontStyle: '900',
             fill: this.resultColor,
             fontFamily: 'Montserrat'
@@ -48,17 +49,18 @@ class GameOverScene extends Phaser.Scene {
 
         // Exibição da Recompensa
         if (this.isWin) {
-            this.add.text(width / 2, height * 0.3, `+${this.reward} MOEDAS`, {
-                fontSize: '28px',
+            this.add.text(width / 2, height * 0.35, `+${this.reward} MOEDAS`, {
+                fontSize: `${Math.floor(width * 0.07)}px`,
                 color: '#ffeb3b',
                 fontFamily: 'Montserrat',
                 fontStyle: 'bold'
             }).setOrigin(0.5);
         }
 
-        new MenuButton(this, width / 2, height / 2, 'JOGAR NOVAMENTE', {
-            width: 250,      // Botão um pouco mais estreito
-            scale: 1,
+        new MenuButton(this, width / 2, height * 0.6, 'JOGAR NOVAMENTE', {
+            width: width * 0.8,
+            height: width * 0.17,
+            fontSize: `${Math.floor(width * 0.07)}px`,
             strokeColor: 0x999999,
             callback: () => {
                 this.scene.start('TitleScene'); // Volta para a tela de título

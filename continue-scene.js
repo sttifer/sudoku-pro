@@ -9,7 +9,7 @@ class ContinueScene extends Phaser.Scene {
         GameBackground.init(this);
 
         const fontSize = Math.floor(width * 0.08);
-        this.add.text(width / 2, height * 0.25, 'PARTIDA\nENCONTRADA', {
+        this.add.text(width / 2, height * 0.2, 'PARTIDA\nENCONTRADA', {
             fontSize: `${fontSize}px`,
             fontStyle: 'bold',
             fill: '#ffffff',
@@ -17,8 +17,13 @@ class ContinueScene extends Phaser.Scene {
             align: 'center'
         }).setOrigin(0.5);
 
+        const spacing = height * 0.12;
+
         // Botão para Continuar
-        new MenuButton(this, width / 2, height / 2 - 40, 'CONTINUAR', {
+        new MenuButton(this, width / 2, height * 0.55, 'CONTINUAR', {
+            width: width * 0.85,
+            height: width * 0.17,
+            fontSize: `${Math.floor(width * 0.07)}px`,
             strokeColor: 0x4caf50,
             callback: () => {
                 const saveData = JSON.parse(localStorage.getItem('sudoku_save'));
@@ -27,7 +32,10 @@ class ContinueScene extends Phaser.Scene {
         });
 
         // Botão para Novo Jogo
-        new MenuButton(this, width / 2, height / 2 + 60, 'NOVO JOGO', {
+        new MenuButton(this, width / 2, height * 0.55 + spacing, 'NOVO JOGO', {
+            width: width * 0.85,
+            height: width * 0.17,
+            fontSize: `${Math.floor(width * 0.07)}px`,
             strokeColor: 0xff9800,
             callback: () => {
                 localStorage.removeItem('sudoku_save');
@@ -36,8 +44,10 @@ class ContinueScene extends Phaser.Scene {
         });
 
         // Botão Voltar
-        // Padronização: Botão de voltar com o ícone de setinha no canto superior
-        const btnSize = Math.max(40, width * 0.1);
-        new BackButton(this, btnSize, btnSize, '←', 'TitleScene');
+        const btnSize = width * 0.13;
+        const margin = width * 0.05;
+        const headerX = margin + (btnSize / 2);
+        const headerY = height * 0.05;
+        new BackButton(this, headerX, headerY, '←', 'TitleScene');
     }
 }

@@ -12,7 +12,7 @@ class MenuButton extends Phaser.GameObjects.Container {
             textColor: options.textColor || '#ffffff',
             scale: options.scale || 1,
             textOffsetX: options.textOffsetX || 0,
-            textOffsetY: options.textOffsetY || 0,
+            textOffsetY: options.textOffsetY !== undefined ? options.textOffsetY : -Math.floor((options.height || 60) * 0.05),
             callback: options.callback || (() => {})
         };
 

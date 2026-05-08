@@ -15,10 +15,10 @@ class SudokuCell extends Phaser.GameObjects.Container {
         
         // Estética: Números bloqueados (fixos) geralmente são brancos ou azul escuro
         // Números que o jogador coloca são de outra cor (ex: amarelo)
-        const textColor = isReadOnly ? '#ffffff' : '#ffff00'; 
+        const textColor = isReadOnly ? '#bbbbbb' : '#90caf9'; // Cinza claro e Azul pastel
         
         this.text = scene.add.text(0, 0, value !== 0 ? value : '', {
-            fontSize: `${Math.floor(size * 0.6)}px`,
+            fontSize: `${Math.floor(size * 0.75)}px`,
             color: textColor,
             fontStyle: 'bold',
             fontFamily: 'Montserrat'
@@ -34,7 +34,7 @@ class SudokuCell extends Phaser.GameObjects.Container {
 
         this.value = newValue;
         this.text.setText(newValue !== 0 ? newValue : '');
-        this.text.setColor(isCorrect ? '#ffff00' : '#ff0000');
+        this.text.setColor(isCorrect ? '#90caf9' : '#ff8a80'); // Azul pastel para correto, vermelho suave para erro
     }
 
     revealHint(correctValue) {

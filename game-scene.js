@@ -16,12 +16,12 @@ class GameScene extends Phaser.Scene {
         this.paletteItems = [];
         
         // Layout
-        this.marginSide = width * 0.05; // 5% da largura de margem
+        this.marginSide = width * 0.03; // Reduzido para dar mais espaço ao grid
         this.innerPadding = height * 0.04; // 4% da altura de respiro
 
         // Calcula o tamanho do grid de forma responsiva: 
         // Removemos o limite fixo de 500 para permitir resoluções altas (HD/4K)
-        this.gridDisplaySize = Math.min(width - (this.marginSide * 2), height * 0.55);
+        this.gridDisplaySize = Math.min(width - (this.marginSide * 2), height * 0.62);
         this.cellSize = this.gridDisplaySize / 9;
         
         this.offsetX = (width - this.gridDisplaySize) / 2;
@@ -67,20 +67,22 @@ class GameScene extends Phaser.Scene {
         // 4. UI de Status
         this.createAttemptsUI(paletteY + (this.cellSize * 2.1));
 
-        // 6. Botão Voltar (Sair e Salvar) - Versão Minimalista
-        const backBtnSize = Math.max(40, width * 0.1);
-        // Usa o BackButton padronizado para o botão de gameplay
-        new BackButton(this, backBtnSize, backBtnSize, '←', 'TitleScene');
+        // Padronização do cabeçalho
+        const headerY = height * 0.05;
+        const btnSize = width * 0.13;
+        const margin = width * 0.05;
+        const headerX = margin + (btnSize / 2);
+
+        new BackButton(this, headerX, headerY, '←', 'TitleScene');
 
         // Botão de Dica (Hint)
         const hints = parseInt(localStorage.getItem('sudoku_hints') || '0');
-        // Aumentamos a largura para comportar números maiores (ex: 999) sem encostar na borda
-        const hintBtnWidth = backBtnSize * 2.2;
-        // Posicionamos para que a margem direita seja exatamente igual à margem esquerda do botão voltar
-        this.hintButton = new MenuButton(this, width - (hintBtnWidth/2) - (backBtnSize/2), backBtnSize, `💡 ${hints}`, {
+        const hintBtnWidth = btnSize * 2.2;
+        
+        this.hintButton = new MenuButton(this, width - (hintBtnWidth/2) - margin, headerY, `💡 ${hints}`, {
             width: hintBtnWidth,
-            height: backBtnSize,
-            fontSize: `${Math.floor(backBtnSize * 0.4)}px`,
+            height: btnSize,
+            fontSize: `${Math.floor(btnSize * 0.45)}px`,
             color: 0x1a1a1a,
             strokeColor: 0x333333,
             callback: () => this.useHint()
@@ -112,7 +114,7 @@ class GameScene extends Phaser.Scene {
         for (let i = 0; i <= 9; i++) {
             const thick = i % 3 === 0 ? 4 : 1;
             const pos = i * this.cellSize;
-            g.lineStyle(thick, 0xffffff);
+            g.lineStyle(thick, 0xffffff, thick > 1 ? 0.5 : 0.2); // Linhas com transparência
             g.lineBetween(pos, 0, pos, this.gridDisplaySize);
             g.lineBetween(0, pos, this.gridDisplaySize, pos);
         }
@@ -141,13 +143,16 @@ class GameScene extends Phaser.Scene {
 
     setupPalette() {
         const itemW = this.gridDisplaySize / 10;
-        const itemH = this.cellSize * 1.2; // Altura da paleta proporcional à célula
+        const itemH = this.cellSize * 1.5; // Paleta mais alta para toque fácil
 
         for (let i = 0; i <= 9; i++) {
             const x = (i * itemW) + (itemW / 2);
             const bg = this.add.rectangle(x, itemH/2, itemW - 4, itemH, 0x333333).setOrigin(0.5);
             const text = this.add.text(x, itemH/2, i === 0 ? "X" : i, {
-                fontSize: `${Math.floor(itemH * 0.5)}px`, color: '#fff', fontStyle: 'bold'
+                fontSize: `${Math.floor(itemH * 0.55)}px`, 
+                color: '#bbbbbb', 
+                fontStyle: 'bold',
+                fontFamily: 'Montserrat' // Fonte igual ao grid
             }).setOrigin(0.5);
             
             this.paletteContainer.add([bg, text]);
@@ -368,8 +373,8 @@ class GameScene extends Phaser.Scene {
                 // Só ativa o visual amarelo se o index bater com a seleção E não for null
                 const active = (this.selectedNumber === index) && (this.selectedNumber !== null);
                 
-                item.text.setColor(active ? '#ffff00' : '#ffffff');
-                item.bg.setStrokeStyle(active ? 3 : 0, 0xffff00);
+                item.text.setColor(active ? '#ffe082' : '#bbbbbb'); // Cores mais suaves
+                item.bg.setStrokeStyle(active ? 3 : 0, 0xffe082);
             }
         });
     }

@@ -23,11 +23,11 @@ class GameBackground {
         // 3. Números decorativos
         ['1', '4', '9', '7', '3'].forEach(num => {
             scene.add.text(
-                Phaser.Math.Between(50, width - 50), // Posição X aleatória
-                Phaser.Math.Between(50, height - 50), // Posição Y aleatória
+                Phaser.Math.Between(50, width - 50),
+                Phaser.Math.Between(50, height - 50),
                 num, { 
                 fontFamily: 'Montserrat', fontSize: '120px', color: '#ffffff', fontStyle: 'bold' 
-            }).setOrigin(0.5).setAlpha(0.03).setRotation(Phaser.Math.FloatBetween(-0.5, 0.5)).setDepth(baseDepth); // Define a profundidade
+            }).setOrigin(0.5).setAlpha(0.03).setRotation(Phaser.Math.FloatBetween(-0.5, 0.5)).setDepth(baseDepth);
         });
     }
 }

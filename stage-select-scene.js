@@ -4,14 +4,15 @@ class StageSelectScene extends Phaser.Scene {
     }
 
     create() {
-        const { width, height } = this.cameras.main;
+        const { width, height } = this.scale;
 
         // Aplica o fundo isolado
         GameBackground.init(this);
 
         // Título
-        this.add.text(width / 2, 80, 'DIFICULDADE', {
-            fontSize: '40px',
+        const titleSize = Math.floor(width * 0.1);
+        this.add.text(width / 2, height * 0.15, 'DIFICULDADE', {
+            fontSize: `${titleSize}px`,
             color: '#ffffff',
             fontStyle: 'bold',
             fontFamily: 'Montserrat'
@@ -26,8 +27,8 @@ class StageSelectScene extends Phaser.Scene {
             { label: 'ESPECIALISTA', value: 9, color: 0xf44336 }
         ];
 
-        let startY = 180;
-        const spacing = 85;
+        let startY = height * 0.32;
+        const spacing = height * 0.12;
 
         // Cria os botões de dificuldade usando a nova classe MenuButton
         difficulties.forEach((diff) => {
@@ -35,6 +36,9 @@ class StageSelectScene extends Phaser.Scene {
             const isUnlocked = diff.value === 1 || localStorage.getItem(`sudoku_unlocked_${diff.value}`) === 'true';
             
             new MenuButton(this, width / 2, startY, isUnlocked ? diff.label : `🔒 ${diff.label}`, {
+                width: width * 0.85,
+                height: width * 0.17,
+                fontSize: `${Math.floor(width * 0.07)}px`,
                 strokeColor: isUnlocked ? diff.color : 0x444444,
                 textColor: isUnlocked ? '#ffffff' : '#777777',
                 callback: () => {
@@ -48,8 +52,11 @@ class StageSelectScene extends Phaser.Scene {
             startY += spacing;
         });
 
-        // Padronização: Botão de voltar com o ícone de setinha no canto superior
-        const btnSize = Math.max(40, width * 0.1);
-        new BackButton(this, btnSize, btnSize, '←', 'TitleScene');
+        // Alinhamento fixo do botão voltar
+        const btnSize = width * 0.13;
+        const margin = width * 0.05;
+        const headerX = margin + (btnSize / 2);
+        const headerY = height * 0.05;
+        new BackButton(this, headerX, headerY, '←', 'TitleScene');
     }
 }
